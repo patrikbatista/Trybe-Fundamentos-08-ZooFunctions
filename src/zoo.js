@@ -7,8 +7,8 @@ function getSpeciesByIds(...ids) {
 
 function getAnimalsOlderThan(animal, age) {
   // seu código aqui
-  return data.species.find((specie) => specie.name === animal)
-    .every((value) => value.residents.age === age);
+  const animalFind = data.species.find((specie) => specie.name === animal);
+  return animalFind.residents.every((value) => value.age >= age);
 }
 
 function getEmployeeByName(employeeName) {
@@ -25,6 +25,8 @@ function createEmployee(personalInfo, associatedWith) {
 
 function isManager(id) {
   // seu código aqui
+  const returnEmployee = data.employees.some((employee) => employee.managers.includes(id));
+  return returnEmployee;
 }
 
 function addEmployee(id, firstName, lastName, managers = [], responsibleFor = []) {
@@ -56,14 +58,41 @@ function getAnimalMap(options) {
 
 function getSchedule(dayName) {
   // seu código aqui
+  const dias = Object.keys(data.hours).reduce((acc, crr, index) => {
+    const valores = Object.values(data.hours)[index];
+    acc[crr] = `Open from ${valores.open}am until ${valores.close - 12}pm`;
+    return acc;
+  }, {});
+  dias.Monday = 'CLOSED';
+  // console.log(dias);
+  if (dayName === undefined) return dias;
+  return { [dayName]: dias[dayName] };
 }
+getSchedule();
 
 function getOldestFromFirstSpecies(id) {
   // seu código aqui
+  const findEmployee = data.employees.find((employee) => employee.id === id);
+  const firstAnimal = data.species.find((specie) => specie.id === findEmployee.responsibleFor[0]);
+  const oldAnimal = firstAnimal.residents.sort((a, b) => b.age - a.age);
+  return Object.values(oldAnimal[0]);
 }
 
 function increasePrices(percentage) {
   // seu código aqui
+  const newPriceArray = Object.values(data.prices).reduce((acc, preco) => {
+    let newPrice = preco;
+    newPrice *= (1 + percentage / 100);
+    newPrice += 0.001;
+    newPrice = Number(newPrice.toFixed(2));
+    acc.push(newPrice);
+    return acc;
+  }, []);
+  const newObjPrice = {};
+  Object.keys(data.prices).forEach((key, index) => {
+    newObjPrice[key] = newPriceArray[index];
+  });
+  return Object.assign(data.prices, newObjPrice);
 }
 
 function getEmployeeCoverage(idOrName) {
